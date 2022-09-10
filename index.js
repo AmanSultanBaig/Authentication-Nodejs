@@ -1,7 +1,11 @@
 const express = require("express")
 const app = express();
 const dbConnection = require("./db/connection")
+const routes = require("./routes/auth")
 require('dotenv').config()
+
+app.use(express.json())
+app.use('/api', routes)
 
 let portNo = 4040 || process.env.PORT
 
