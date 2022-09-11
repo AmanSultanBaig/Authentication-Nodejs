@@ -7,7 +7,7 @@ const signUp = async (req, res) => {
     try {
         const isExist = await userModel.findOne({ email: email.trim() })
         if (isExist) {
-            return res.status(404).json({
+            return res.status(400).json({
                 data: {},
                 status: false,
                 message: `User already exist with this ${email}`
@@ -38,6 +38,43 @@ const signUp = async (req, res) => {
     }
 }
 
+const verifyAccount = async (req, res) => {
+    const { verificationToken } = req.body
+    try {
+        jwt.verify(verificationToken, process.env.VERIFICATION_SECRET_KEY, async (err, decode) => {
+            if (err) {
+                return res.status(400).json({
+                    data: {},
+                    status: false,
+                    message: `Token has been expired or Invalid!`
+                })
+            }
+            const { name, email, password } = decode;
+            const isUserExist = await userModel.findOne({ email: email.trim() })
+            if(isUserExist) {
+                return res.status(400).json({
+                    data: {},
+                    status: false,
+                    message: `Account can not be activate with this ${email}, it's already exist.`
+                })
+            }
+            await userModel.create({ name, email, password });
+            res.status(200).json({
+                data: {},
+                status: true,
+                message: `Account has been activated successfully!`
+            })
+        })
+    } catch (error) {
+        res.status(error.status).json({
+            data: {},
+            status: false,
+            message: error.message
+        })
+    }
+}
+
 module.exports = {
-    signUp
+    signUp,
+    verifyAccount
 }
