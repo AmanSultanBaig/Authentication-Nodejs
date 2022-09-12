@@ -1,6 +1,7 @@
 const sendEmail = require("../helper/mailer");
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/auth.model")
+const bcrypt = require("../helper/bcrypt")
 
 const signUp = async (req, res) => {
     const { email } = req.body;
@@ -50,6 +51,9 @@ const verifyAccount = async (req, res) => {
                 })
             }
             const { name, email, password } = decode;
+
+            let hashedPassword = await bcrypt.hashPassword(password)
+
             const isUserExist = await userModel.findOne({ email: email.trim() })
             if(isUserExist) {
                 return res.status(400).json({
@@ -58,7 +62,7 @@ const verifyAccount = async (req, res) => {
                     message: `Account can not be activate with this ${email}, it's already exist.`
                 })
             }
-            await userModel.create({ name, email, password });
+            await userModel.create({ name, email, password: hashedPassword });
             res.status(200).json({
                 data: {},
                 status: true,
