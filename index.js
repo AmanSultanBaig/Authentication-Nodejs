@@ -2,12 +2,13 @@ const express = require("express")
 const app = express();
 const dbConnection = require("./db/connection")
 const routes = require("./routes/auth")
-const { notFound } = require("./middlewares/error-handling")
+const { notFound, errorHandler } = require("./middlewares/error-handling")
 require('dotenv').config()
 
 
 app.use(express.json())
 app.use('/api', routes)
+app.use(errorHandler) // global error handling | middlerware
 app.use(notFound) // if routes does'nt exist | error handling
 
 let portNo = 4040 || process.env.PORT
