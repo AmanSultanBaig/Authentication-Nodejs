@@ -9,9 +9,8 @@ const signUp = async (req, res) => {
         const isExist = await userModel.findOne({ email: email.trim() })
         if (isExist) {
             return res.status(400).json({
-                data: {},
                 status: false,
-                message: `User already exist with this ${email}`
+                message: `User already exist with this ${email}`,
             })
         }
         let verificationToken = jwt.sign(req.body, process.env.VERIFICATION_SECRET_KEY, { expiresIn: "10m" })
@@ -26,13 +25,11 @@ const signUp = async (req, res) => {
         }
         await sendEmail(mailObject, "html")
         res.status(200).json({
-            data: {},
             status: true,
-            message: `Account has been created! Please check email to verify!`
+            message: `Account has been created! Please check email to verify!`,
         })
     } catch (error) {
-        res.status(error.status).json({
-            data: {},
+        res.status(error.status || 500).json({
             status: false,
             message: error.message
         })
@@ -45,9 +42,8 @@ const verifyAccount = async (req, res) => {
         jwt.verify(verificationToken, process.env.VERIFICATION_SECRET_KEY, async (err, decode) => {
             if (err) {
                 return res.status(400).json({
-                    data: {},
                     status: false,
-                    message: `Token has been expired or Invalid!`
+                    message: `Token has been expired or Invalid!`,
                 })
             }
             const { name, email, password } = decode;
@@ -55,23 +51,55 @@ const verifyAccount = async (req, res) => {
             let hashedPassword = await bcrypt.hashPassword(password)
 
             const isUserExist = await userModel.findOne({ email: email.trim() })
-            if(isUserExist) {
+            if (isUserExist) {
                 return res.status(400).json({
-                    data: {},
                     status: false,
-                    message: `Account can not be activate with this ${email}, it's already exist.`
+                    message: `Account can not be activate with this ${email}, it's already exist.`,
                 })
             }
             await userModel.create({ name, email, password: hashedPassword });
             res.status(200).json({
-                data: {},
                 status: true,
-                message: `Account has been activated successfully!`
+                message: `Account has been activated successfully!`,
             })
         })
     } catch (error) {
-        res.status(error.status).json({
-            data: {},
+        res.status(error.status || 500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const isUserExist = await userModel.findOne({ email: email.trim() });
+
+        if (!isUserExist) {
+            return res.status(404).json({
+                status: false,
+                message: `No such user found with ${email}`
+            })
+        }
+        const isCredentialsValid = await bcrypt.comparePassword(password, isUserExist.password);
+
+        if (!isCredentialsValid) {
+            return res.status(400).json({
+                status: false,
+                message: `Invalid email or password, please try again with valid credentials!`
+            })
+        }
+
+        const accessToken = await jwt.sign({ id: isUserExist._id }, process.env.LOGIN_SECRET_KEY, { expiresIn: "7d" });
+
+        res.status(200).json({
+            status: true,
+            message: `Logged-in successfully!`,
+            data: { token: accessToken, user: { email: isUserExist.email, name: isUserExist.name, id: isUserExist._id } },
+        })
+    } catch (error) {
+        res.status(error.status || 500).json({
             status: false,
             message: error.message
         })
@@ -80,5 +108,6 @@ const verifyAccount = async (req, res) => {
 
 module.exports = {
     signUp,
-    verifyAccount
+    verifyAccount,
+    login
 }
