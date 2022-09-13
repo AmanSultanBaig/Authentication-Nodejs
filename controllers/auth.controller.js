@@ -119,7 +119,7 @@ const forgotPassword = async (req, res) => {
         }
 
         const token = await jwt.sign({ id: isUserExist._id }, process.env.RESET_PASSWORD_SECRET_KEY, { expiresIn: "20m" });
-        
+
         let mailObject = {
             from: process.env.MAIL_ACCOUNT_EMAIL,
             to: email,
@@ -138,9 +138,44 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+const resetPassword = async (req, res) => {
+    const { token, password, confirm_password } = req.body;
+    const newHashedPassword = await bcrypt.hashPassword(password);
+
+    try {
+        await jwt.verify(token, process.env.RESET_PASSWORD_SECRET_KEY, async (err, decodedToken) => {
+            if (err) {
+                return res.status(400).json({
+                    status: false,
+                    message: `Token has been expired or Invalid!`,
+                })
+            }
+
+            if (password != confirm_password) {
+                return res.status(400).json({
+                    status: false,
+                    message: `Password and Confirm Password are not matched, Please try again`,
+                })
+            }
+
+            await userModel.updateOne({ _id: decodedToken.id }, { $set: { password: newHashedPassword } });
+            res.status(200).json({
+                status: true,
+                message: `Password has been changed successfully!`,
+            })
+        })
+    } catch (error) {
+        res.status(error.status || 500).json({
+            status: false,
+            message: error.message,
+        })
+    }
+}
+
 module.exports = {
     signUp,
     verifyAccount,
     login,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }

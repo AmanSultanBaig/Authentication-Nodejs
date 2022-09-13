@@ -8,5 +8,6 @@ router.post("/user/sign-up", AuthController.signUp)
 router.post("/user/verify-account", AuthController.verifyAccount)
 
 router.post("/user/forgot-password", AuthController.forgotPassword)
+router.put("/user/reset-password", AuthController.resetPassword)
 
 module.exports = router;
