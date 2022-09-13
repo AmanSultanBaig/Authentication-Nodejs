@@ -106,8 +106,41 @@ const login = async (req, res) => {
     }
 }
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const isUserExist = await userModel.findOne({ email: email.trim() });
+
+        if (!isUserExist) {
+            return res.status(404).json({
+                status: false,
+                message: `No such user found with ${email}`
+            })
+        }
+
+        const token = await jwt.sign({ id: isUserExist._id }, process.env.RESET_PASSWORD_SECRET_KEY, { expiresIn: "20m" });
+        
+        let mailObject = {
+            from: process.env.MAIL_ACCOUNT_EMAIL,
+            to: email,
+            subject: 'Reset Password',
+            html: `<p>Please click to given link below to reset your password!</p>
+            <a href='${process.env.FRONTENT_URL}/reset-password/${token}'>Reset Password!<a/>
+            `
+        }
+        await sendEmail(mailObject, "html")
+        res.status(200).json({
+            status: true,
+            message: `Forgot password request submitted successfuly, Please check your email!`,
+        })
+    } catch (error) {
+
+    }
+}
+
 module.exports = {
     signUp,
     verifyAccount,
-    login
+    login,
+    forgotPassword
 }
