@@ -140,7 +140,6 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     const { token, password, confirm_password } = req.body;
-    const newHashedPassword = await bcrypt.hashPassword(password);
 
     try {
         await jwt.verify(token, process.env.RESET_PASSWORD_SECRET_KEY, async (err, decodedToken) => {
@@ -157,6 +156,7 @@ const resetPassword = async (req, res) => {
                     message: `Password and Confirm Password are not matched, Please try again`,
                 })
             }
+            const newHashedPassword = await bcrypt.hashPassword(password);
 
             await userModel.updateOne({ _id: decodedToken.id }, { $set: { password: newHashedPassword } });
             res.status(200).json({
