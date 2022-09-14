@@ -2,37 +2,16 @@ const sendEmail = require("../helper/mailer");
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/auth.model")
 const bcrypt = require("../helper/bcrypt")
+const AuthService = require("../services/auth-service")
+// Service Instance
+const AuthServiceInstance = new AuthService();
 
 const signUp = async (req, res) => {
-    const { email } = req.body;
     try {
-        const isExist = await userModel.findOne({ email: email.trim() })
-        if (isExist) {
-            return res.status(400).json({
-                status: false,
-                message: `User already exist with this ${email}`,
-            })
-        }
-        let verificationToken = jwt.sign(req.body, process.env.VERIFICATION_SECRET_KEY, { expiresIn: "10m" })
-
-        let mailObject = {
-            from: process.env.MAIL_ACCOUNT_EMAIL,
-            to: email,
-            subject: 'Account Activation',
-            html: `<p>Please click to given link below to verify your account!</p>
-            <a href='${process.env.FRONTENT_URL}/verify/${verificationToken}'>Verify Account Now!<a/>
-            `
-        }
-        await sendEmail(mailObject, "html")
-        res.status(200).json({
-            status: true,
-            message: `Account has been created! Please check email to verify!`,
-        })
+        const data = await AuthServiceInstance.SignUp(req.body);
+        res.status(data.status).json({  status: true, message: data.message })
     } catch (error) {
-        res.status(error.status || 500).json({
-            status: false,
-            message: error.message
-        })
+        res.status(error.status || 500 ).json({  status: true, message: error.message })
     }
 }
 
