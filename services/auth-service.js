@@ -109,6 +109,28 @@ class AuthService {
         }
     }
 
+    async ChangePassword(body) {
+        const { token, password, confirm_password } = body;
+
+        try {
+            const decoded = jwtTokenVerification(token, RESET_PASSWORD_SECRET_KEY);
+
+            if (!decoded) {
+                return { status: 400, message: `Token has been expired or Invalid!` }
+            }
+
+            if (password != confirm_password) {
+                return { status: 400, message: `Password and Confirm Password are not matched, Please try again` }
+            }
+            const newHashedPassword = await bcrypt.hashPassword(password);
+
+            await userModel.updateOne({ _id: decodedToken.id }, { $set: { password: newHashedPassword } });
+            return { status: 200, message: `Password has been changed successfully!` }
+        } catch (error) {
+            return { status: 500, message: error.message }
+        }
+    }
+
 }
 
 module.exports = AuthService
