@@ -11,42 +11,16 @@ const signUp = async (req, res) => {
         const data = await AuthServiceInstance.SignUp(req.body);
         res.status(data.status).json({  status: true, message: data.message })
     } catch (error) {
-        res.status(error.status || 500 ).json({  status: true, message: error.message })
+        res.status(error.status).json({  status: true, message: error.message })
     }
 }
 
 const verifyAccount = async (req, res) => {
-    const { verificationToken } = req.body
     try {
-        jwt.verify(verificationToken, process.env.VERIFICATION_SECRET_KEY, async (err, decode) => {
-            if (err) {
-                return res.status(400).json({
-                    status: false,
-                    message: `Token has been expired or Invalid!`,
-                })
-            }
-            const { name, email, password } = decode;
-
-            let hashedPassword = await bcrypt.hashPassword(password)
-
-            const isUserExist = await userModel.findOne({ email: email.trim() })
-            if (isUserExist) {
-                return res.status(400).json({
-                    status: false,
-                    message: `Account can not be activate with this ${email}, it's already exist.`,
-                })
-            }
-            await userModel.create({ name, email, password: hashedPassword });
-            res.status(200).json({
-                status: true,
-                message: `Account has been activated successfully!`,
-            })
-        })
+        const data = await AuthServiceInstance.AccountActivation(req.body);
+        res.status(data.status).json({  status: true, message: data.message })
     } catch (error) {
-        res.status(error.status || 500).json({
-            status: false,
-            message: error.message
-        })
+        res.status(error.status).json({  status: false, message: error.message })
     }
 }
 
