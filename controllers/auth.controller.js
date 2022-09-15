@@ -25,37 +25,11 @@ const verifyAccount = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const { email, password } = req.body;
     try {
-        const isUserExist = await userModel.findOne({ email: email.trim() });
-
-        if (!isUserExist) {
-            return res.status(404).json({
-                status: false,
-                message: `No such user found with ${email}`
-            })
-        }
-        const isCredentialsValid = await bcrypt.comparePassword(password, isUserExist.password);
-
-        if (!isCredentialsValid) {
-            return res.status(400).json({
-                status: false,
-                message: `Invalid email or password, please try again with valid credentials!`
-            })
-        }
-
-        const accessToken = await jwt.sign({ id: isUserExist._id }, process.env.LOGIN_SECRET_KEY, { expiresIn: "7d" });
-
-        res.status(200).json({
-            status: true,
-            message: `Logged-in successfully!`,
-            data: { token: accessToken, user: { email: isUserExist.email, name: isUserExist.name, id: isUserExist._id } },
-        })
+        const response = await AuthServiceInstance.SignIn(req.body);
+        res.status(response.status).json({  status: true, message: response.message, data: response.data })
     } catch (error) {
-        res.status(error.status || 500).json({
-            status: false,
-            message: error.message
-        })
+        res.status(error.status).json({  status: false, message: error.message })
     }
 }
 

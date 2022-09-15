@@ -3,7 +3,7 @@ const userModel = require("../models/auth.model")
 const bcrypt = require("../helper/bcrypt");
 
 const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")
-const { VERIFICATION_SECRET_KEY, FRONTENT_URL } = process.env
+const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY } = process.env
 
 class AuthService {
 
@@ -49,6 +49,35 @@ class AuthService {
             }
             await userModel.create({ name, email, password: hashedPassword });
             return { status: 200, message: `Account has been activated successfully!` }
+        } catch (error) {
+            return { status: 500, message: error.message }
+        }
+    }
+
+    async SignIn(body) {
+        const { email, password } = body;
+        try {
+            const isUserExist = await userModel.findOne({ email: email.trim() });
+
+            if (!isUserExist) {
+                return { status: 400, message: `No such user found with ${email}` }
+            }
+            const isCredentialsValid = await bcrypt.comparePassword(password, isUserExist.password);
+
+            if (!isCredentialsValid) {
+                return { status: 400, message: `Invalid email or password, please try again with valid credentials!` }
+            }
+
+            const accessToken = createJwtToken({ id: isUserExist._id }, LOGIN_SECRET_KEY, "7d");
+
+            return {
+                status: 200,
+                message: `Logged-in successfully!`,
+                data: {
+                    token: accessToken,
+                    user: { email: isUserExist.email, name: isUserExist.name, id: isUserExist._id }
+                },
+            }
         } catch (error) {
             return { status: 500, message: error.message }
         }
