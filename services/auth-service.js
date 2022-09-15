@@ -3,7 +3,7 @@ const userModel = require("../models/auth.model")
 const bcrypt = require("../helper/bcrypt");
 
 const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")
-const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY } = process.env
+const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY, RESET_PASSWORD_SECRET_KEY } = process.env
 
 class AuthService {
 
@@ -78,6 +78,32 @@ class AuthService {
                     user: { email: isUserExist.email, name: isUserExist.name, id: isUserExist._id }
                 },
             }
+        } catch (error) {
+            return { status: 500, message: error.message }
+        }
+    }
+
+    async ForgotPassword(body) {
+        const { email } = body;
+        try {
+            const isUserExist = await userModel.findOne({ email: email.trim() });
+
+            if (!isUserExist) {
+                return { status: 404, message: `No such user found with ${email}` }
+            }
+
+            const token = createJwtToken({ id: isUserExist._id }, RESET_PASSWORD_SECRET_KEY, "20m");
+
+            let mailObject = {
+                from: process.env.MAIL_ACCOUNT_EMAIL,
+                to: email,
+                subject: 'Reset Password',
+                html: `<p>Please click to given link below to reset your password!</p>
+                <a href='${process.env.FRONTENT_URL}/reset-password/${token}'>Reset Password!<a/>
+                `
+            }
+            await sendEmail(mailObject, "html")
+            return { status: 200, message: `Forgot password request submitted successfuly, Please check your email!` }
         } catch (error) {
             return { status: 500, message: error.message }
         }
