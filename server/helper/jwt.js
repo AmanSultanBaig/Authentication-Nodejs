@@ -18,8 +18,6 @@ const createJwtToken = (payload, signature, expires_within) => {
     }
 }
 
-
-
 module.exports = {
     jwtTokenVerification,
     createJwtToken

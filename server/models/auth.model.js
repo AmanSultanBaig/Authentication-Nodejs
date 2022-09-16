@@ -17,6 +17,14 @@ const UserSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    facebookId: {
+        type: String,
+        default: ""
+    },
+    googleId: {
+        type: String,
+        default: ""
+    }
 },
     { timestamps: true }
 )
