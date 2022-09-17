@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router();
+const passport = require('passport');
 
 const AuthController = require("../controllers/auth.controller")
 
@@ -9,5 +10,10 @@ router.post("/user/verify-account", AuthController.verifyAccount)
 
 router.post("/user/forgot-password", AuthController.forgotPassword)
 router.put("/user/reset-password", AuthController.resetPassword)
+
+// social login routes
+// ********** Facebook Authentication ************ // 
+router.get('/login/facebook', passport.authenticate('facebook'));
+router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), (req, res) => { res.send("Request Failed") });
 
 module.exports = router;

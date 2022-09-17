@@ -3,11 +3,16 @@ const app = express();
 const dbConnection = require("./db/connection")
 const routes = require("./routes/auth")
 const { notFound, errorHandler } = require("./middlewares/error-handling")
+const passport = require('passport');
 require('dotenv').config()
-
+require("./helper/passport")
 
 app.use(express.json())
 app.use('/api', routes)
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(errorHandler) // global error handling | middlerware
 app.use(notFound) // if routes does'nt exist | error handling
 
