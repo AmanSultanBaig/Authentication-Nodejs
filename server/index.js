@@ -10,18 +10,15 @@ require("./helper/passport")
 
 const { secretKey, DB_CONNECTION_STRING, PORT } = process.env;
 
+// its necessary to mention passport session before all upcoming middlewares
+app.use(session({ secret: secretKey, resave: false, saveUninitialized: true })) 
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use('/api', routes)
 
-app.use(session({
-    secret: secretKey,
-    saveUninitialized: true,
-    resave: false
-}))
-
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(errorHandler) // global error handling | middlerware
 app.use(notFound) // if routes does'nt exist | error handling

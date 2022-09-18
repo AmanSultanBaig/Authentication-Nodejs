@@ -16,6 +16,5 @@ passport.use(new FacebookStrategy({
     callbackURL: `${BACKEND_URL}/callback`,
     profile: ['id', 'email', 'displayName'] // You have the option to specify the profile objects you want returned
 }, function (accessToken, refreshToken, profile, done) {
-    console.log(profile)
     return done(null, profile);
 }))
