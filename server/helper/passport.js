@@ -14,16 +14,19 @@ passport.deserializeUser(function (obj, cb) {
 });
 
 passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_CLIENT_ID,//The App ID generated when app was created on https://developers.facebook.com/
-    clientSecret: FACEBOOK_CLIENT_SECRET,//The App Secret generated when app was created on https://developers.facebook.com/
+    clientID: FACEBOOK_CLIENT_ID, //The App ID generated when app was created on https://developers.facebook.com/
+    clientSecret: FACEBOOK_CLIENT_SECRET, //The App Secret generated when app was created on https://developers.facebook.com/
     callbackURL: `${BACKEND_URL}/callback`,
     profileFields: ['id', 'email', 'displayName'] // You have the option to specify the profile objects you want returned
 }, async function (accessToken, refreshToken, profile, done) {
     const fbUserDetails = profile._json;
     let response = {}
 
-    let isUserExist = await UserModel.findOne({ facebook_id: fbUserDetails.id, email: fbUserDetails.email })
+    const { email, name, id } = fbUserDetails
 
+    let isUserExist = await UserModel.findOne({ facebook_id: id, email: email })
+
+    // if user from facebook is already exist in system
     if (isUserExist) {
         const fb_loginToken = createJwtToken({ id: isUserExist._id }, LOGIN_SECRET_KEY, "7d");
         response = {
@@ -32,19 +35,20 @@ passport.use(new FacebookStrategy({
         }
         return done(null, response)
     }
-    let hashedPassword = await hashPassword(fbUserDetails.id)
+    // generating password for facebook user
+    const hashedPassword = await hashPassword(id)
 
     const body = {
-        email: fbUserDetails.email,
-        name: fbUserDetails.name,
-        facebookId: fbUserDetails.id,
+        email: email,
+        name: name,
+        facebookId: id,
         password: hashedPassword
     }
 
     response = {
         token: accessToken,
-        user: { email: fbUserDetails.email, name: fbUserDetails.name, id: fbUserDetails.id }
+        user: { email: email, name: name, id: id }
     }
-    await UserModel.create(body)
+    await UserModel.create(body)     // creating fb user to system
     return done(null, response);
 }))
