@@ -14,7 +14,7 @@ passport.use(new FacebookStrategy({
     clientID: FACEBOOK_CLIENT_ID,//The App ID generated when app was created on https://developers.facebook.com/
     clientSecret: FACEBOOK_CLIENT_SECRET,//The App Secret generated when app was created on https://developers.facebook.com/
     callbackURL: `${BACKEND_URL}/callback`,
-    profile: ['id', 'email', 'displayName'] // You have the option to specify the profile objects you want returned
+    profileFields: ['id', 'email', 'displayName'] // You have the option to specify the profile objects you want returned
 }, function (accessToken, refreshToken, profile, done) {
     return done(null, profile);
 }))

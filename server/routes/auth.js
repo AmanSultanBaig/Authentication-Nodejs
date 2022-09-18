@@ -16,7 +16,7 @@ router.get("/login", (req, res) => res.send("Login failed with Facebook"))
 
 // social login routes
 // ********** Facebook Authentication ************ // 
-router.get('/login/facebook', passport.authenticate('facebook'));
+router.get('/login/facebook', passport.authenticate('facebook', { scope : ['email'] }));
 router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/login', failureMessage: true  }), (req, res) => { 
     res.send("Logged In successfully") 
     console.log("FB loggedin user: ",req.user)
