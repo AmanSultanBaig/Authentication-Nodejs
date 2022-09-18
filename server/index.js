@@ -10,7 +10,7 @@ require("./helper/passport")
 
 const { secretKey, DB_CONNECTION_STRING, PORT } = process.env;
 
-// its necessary to mention passport session before all upcoming middlewares
+// its necessary to mention express-session before all upcoming middlewares
 app.use(session({ secret: secretKey, resave: false, saveUninitialized: true })) 
 
 app.use(express.json())
