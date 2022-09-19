@@ -1,9 +1,10 @@
 const { jwtTokenVerification } = require("../helper/jwt")
 const path = require("path")
-require("dotenv").config({ path: path.resolve(__dirname, '../.env')  })
+require("dotenv").config({ path: path.resolve(__dirname, '../.env') })
 const { LOGIN_SECRET_KEY } = process.env
 
 const UserModel = require("../models/auth.model")
+const RoleModel = require("../models/roles.model")
 
 const authenticateUser = async (req, res, next) => {
     const { authorization } = req.headers
@@ -29,7 +30,18 @@ const authenticateUser = async (req, res, next) => {
 
 const authorizedUser = async (req, res, next) => {
     const { authorization } = req.headers
-    const roles = ["admin", "user"] 
+
+    const pipeline = [{
+        $group: {
+            _id: "null",
+            name: { "$push": "$name" }
+        },
+    },
+    { $project: { "name": 1, _id: 0 } }]
+
+    let roles = await RoleModel.aggregate(pipeline)
+
+    !roles.length ? roles = ["user"] : roles = roles[0].name
 
     if (!authorization) {
         return res.status(401).json({ status: false, message: "Token required" })
@@ -48,7 +60,7 @@ const authorizedUser = async (req, res, next) => {
     }
 
     if (!roles.includes(userFound.role)) {
-        return res.status(401).json({ status: false, message: "You don't have access to this api"})
+        return res.status(401).json({ status: false, message: "You don't have access to this api" })
     }
 
     next()
