@@ -28,15 +28,16 @@ passport.use(new FacebookStrategy({
 
     // if user from facebook is already exist in system
     if (isUserExist) {
-        const fb_loginToken = createJwtToken({ id: isUserExist._id }, LOGIN_SECRET_KEY, "7d");
+        const loginToken = createJwtToken({ "email": isUserExist.email }, LOGIN_SECRET_KEY, "7d");
         response = {
-            token: fb_loginToken,
+            token: loginToken,
             user: { email: isUserExist.email, name: isUserExist.name, id: isUserExist._id }
         }
         return done(null, response)
     }
     // generating password for facebook user
     const hashedPassword = await hashPassword(id)
+    const fb_loginToken = createJwtToken({ "email": email }, LOGIN_SECRET_KEY, "7d");
 
     const body = {
         email: email,
@@ -46,7 +47,7 @@ passport.use(new FacebookStrategy({
     }
 
     response = {
-        token: accessToken,
+        token: fb_loginToken,
         user: { email: email, name: name, id: id }
     }
     await UserModel.create(body)     // creating fb user to system

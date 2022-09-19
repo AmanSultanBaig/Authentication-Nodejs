@@ -68,7 +68,7 @@ class AuthService {
                 return { status: 400, message: `Invalid email or password, please try again with valid credentials!` }
             }
 
-            const accessToken = createJwtToken({ id: isUserExist._id }, LOGIN_SECRET_KEY, "7d");
+            const accessToken = createJwtToken({ "email": isUserExist.email }, LOGIN_SECRET_KEY, "7d");
 
             return {
                 status: 200,
