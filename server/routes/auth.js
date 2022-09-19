@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const passport = require('passport');
-const { authenticateUser } = require("../middlewares/auth-handling")
+const { authenticateUser, authorizedUser } = require("../middlewares/auth-handling")
 
 const AuthController = require("../controllers/auth.controller")
 
@@ -25,6 +25,6 @@ router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/l
 });
 
 // protected routes | only logged in user can access 
-router.get("/user/access-user", authenticateUser, AuthController.getUserAccess)
+router.get("/user/access-user", authenticateUser, authorizedUser, AuthController.getUserAccess)
 
 module.exports = router;

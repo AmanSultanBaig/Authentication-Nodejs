@@ -21,9 +21,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    googleId: {
+    role: {
         type: String,
-        default: ""
+        default: "user"
     }
 },
     { timestamps: true }
