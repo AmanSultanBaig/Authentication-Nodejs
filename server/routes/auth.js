@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const passport = require('passport');
+const { authenticateUser } = require("../middlewares/auth-handling")
 
 const AuthController = require("../controllers/auth.controller")
 
@@ -16,11 +17,14 @@ router.get("/login", (req, res) => res.send("Login failed with Facebook"))
 
 // social login routes
 // ********** Facebook Authentication ************ // 
-router.get('/login/facebook', passport.authenticate('facebook', { scope : ['email'] }));
-router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/login', failureMessage: true  }), (req, res) => { 
-    res.send("Logged In successfully") 
-    console.log("FB loggedin user: ",req.user)
-    console.log("Facebook Authentication: ",req.isAuthenticated())
+router.get('/login/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/login', failureMessage: true }), (req, res) => {
+    res.send("Logged In successfully")
+    console.log("FB loggedin user: ", req.user)
+    console.log("Facebook Authentication: ", req.isAuthenticated())
 });
+
+// protected routes | only logged in user can access 
+router.get("/user/access-user", authenticateUser, AuthController.getUserAccess)
 
 module.exports = router;

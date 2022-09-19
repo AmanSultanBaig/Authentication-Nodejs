@@ -47,10 +47,18 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const getUserAccess = (req, res) => {
+    res.status(200).json({
+        status: true, 
+        message: "I Have accessed this route"
+    })
+}
+
 module.exports = {
     signUp,
     verifyAccount,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getUserAccess
 }

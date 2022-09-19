@@ -1,5 +1,8 @@
 const { jwtTokenVerification } = require("../helper/jwt")
+const path = require("path")
+require("dotenv").config({ path: path.resolve(__dirname, '../.env')  })
 const { LOGIN_SECRET_KEY } = process.env
+
 const UserModel = require("../models/auth.model")
 
 const authenticateUser = async (req, res, next) => {
@@ -16,7 +19,7 @@ const authenticateUser = async (req, res, next) => {
         return res.status(401).json({ status: false, message: "Invalid or token expired, Please login again!" })
     }
 
-    const userFound = await UserModel.findOne({ _id: decodeToken.id })
+    const userFound = await UserModel.findOne({ "email": decodeToken.email })
     if (!userFound) {
         return res.status(404).json({ status: false, message: "Invalid user request to login" })
     }
