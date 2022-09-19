@@ -1,6 +1,3 @@
-const sendEmail = require("../helper/mailer");
-const userModel = require("../models/auth.model")
-const bcrypt = require("../helper/bcrypt")
 const AuthService = require("../services/auth-service")
 // Service Instance
 const AuthServiceInstance = new AuthService();
