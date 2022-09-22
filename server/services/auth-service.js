@@ -1,5 +1,5 @@
 const sendEmail = require("../helper/mailer");
-const userModel = require("../models/auth.model")
+const userModel = require("../models/user.model")
 const bcrypt = require("../helper/bcrypt");
 
 const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")

@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express();
 const dbConnection = require("./db/connection")
-const routes = require("./routes/auth")
+const routes = require("./routes/user")
 const { notFound, errorHandler } = require("./middlewares/error-handling")
 const passport = require('passport');
 const session = require("express-session")

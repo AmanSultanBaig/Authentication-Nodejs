@@ -3,7 +3,7 @@ const path = require("path")
 require("dotenv").config({ path: path.resolve(__dirname, '../.env') })
 const { LOGIN_SECRET_KEY } = process.env
 
-const UserModel = require("../models/auth.model")
+const UserModel = require("../models/user.model")
 const RoleModel = require("../models/roles.model")
 
 const authenticateUser = async (req, res, next) => {

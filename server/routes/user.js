@@ -3,14 +3,14 @@ const router = express.Router();
 const passport = require('passport');
 const { authenticateUser, authorizedUser } = require("../middlewares/auth-handling")
 
-const AuthController = require("../controllers/auth.controller")
+const UserController = require("../controllers/user.controller")
 
-router.post("/user/login", AuthController.login)
-router.post("/user/sign-up", AuthController.signUp)
-router.post("/user/verify-account", AuthController.verifyAccount)
+router.post("/user/login", UserController.login)
+router.post("/user/sign-up", UserController.signUp)
+router.post("/user/verify-account", UserController.verifyAccount)
 
-router.post("/user/forgot-password", AuthController.forgotPassword)
-router.put("/user/reset-password", AuthController.resetPassword)
+router.post("/user/forgot-password", UserController.forgotPassword)
+router.put("/user/reset-password", UserController.resetPassword)
 
 // If login failed with facebook
 router.get("/login", (req, res) => res.send("Login failed with Facebook"))
@@ -25,6 +25,6 @@ router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/l
 });
 
 // protected routes | only logged in user can access 
-router.get("/user/access-user", authenticateUser, authorizedUser, AuthController.getUserAccess)
+router.get("/user/access-user", authenticateUser, authorizedUser, UserController.getUserAccess)
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const UserModel = require("../models/auth.model")
+const UserModel = require("../models/user.model")
 const { hashPassword } = require("../helper/bcrypt")
 const { createJwtToken } = require("../helper/jwt")
 
