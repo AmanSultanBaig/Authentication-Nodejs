@@ -2,12 +2,12 @@ const userModel = require("../models/user.model")
 
 class UserRepository {
 
-    async getByColumns(params){
+    async getDocumentByColumns(params) {
         const data = await userModel.findOne(params);
-        if(!data) {
-            return {status: false, message: "No record found", data}
+        if (!data) {
+            return { status: false, message: "No record found", data }
         }
-        return {status: false, message: "Record found", data}
+        return { status: false, message: "Record found", data }
     }
 
 }
