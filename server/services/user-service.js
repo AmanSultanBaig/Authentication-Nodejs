@@ -2,10 +2,14 @@ const sendEmail = require("../helper/mailer");
 const userModel = require("../models/user.model")
 const bcrypt = require("../helper/bcrypt");
 
+const userRepository = require("../repositories/user.repository")
+
 const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")
 const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY, RESET_PASSWORD_SECRET_KEY } = process.env
 
-class AuthService {
+const user_repo = new userRepository();
+
+class UserService {
 
     async SignUp(body) {
         const { email } = body;
@@ -133,4 +137,4 @@ class AuthService {
 
 }
 
-module.exports = AuthService
+module.exports = UserService
