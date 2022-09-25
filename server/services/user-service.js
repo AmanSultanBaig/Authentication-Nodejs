@@ -1,5 +1,4 @@
 const sendEmail = require("../helper/mailer");
-const userModel = require("../models/user.model")
 const bcrypt = require("../helper/bcrypt");
 
 const userRepository = require("../repositories/user.repository")
@@ -7,14 +6,14 @@ const userRepository = require("../repositories/user.repository")
 const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")
 const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY, RESET_PASSWORD_SECRET_KEY } = process.env
 
-const user_repo = new userRepository();
+const userRepo = new userRepository();
 
 class UserService {
 
     async SignUp(body) {
         const { email } = body;
         try {
-            const isExist = await userModel.findOne({ email: email.trim() })
+            const isExist = await userRepo.getSingleUser({ email: email.trim() })
             if (isExist) {
                 return { status: 400, message: `User already exist with this ${email}` }
             }
@@ -47,11 +46,11 @@ class UserService {
 
             let hashedPassword = await bcrypt.hashPassword(password)
 
-            const isUserExist = await userModel.findOne({ "email": email.trim() }).exec()
+            const isUserExist = await userRepo.getSingleUser({ "email": email.trim() })
             if (isUserExist) {
                 return { status: 400, message: `Account can not be activate with this ${email}, it's already exist.` }
             }
-            await userModel.create({ name, email, password: hashedPassword });
+            await userRepo.createUser({ name, email, password: hashedPassword });
             return { status: 200, message: `Account has been activated successfully!` }
         } catch (error) {
             return { status: 500, message: error.message }
@@ -61,7 +60,7 @@ class UserService {
     async SignIn(body) {
         const { email, password } = body;
         try {
-            const isUserExist = await userModel.findOne({ email: email.trim() });
+            const isUserExist = await userRepo.getSingleUser({ email: email.trim() });
 
             if (!isUserExist) {
                 return { status: 400, message: `No such user found with ${email}` }
@@ -90,7 +89,7 @@ class UserService {
     async ForgotPassword(body) {
         const { email } = body;
         try {
-            const isUserExist = await userModel.findOne({ email: email.trim() });
+            const isUserExist = await userRepo.getSingleUser({ email: email.trim() });
 
             if (!isUserExist) {
                 return { status: 404, message: `No such user found with ${email}` }
@@ -128,7 +127,7 @@ class UserService {
             }
             const newHashedPassword = await bcrypt.hashPassword(password);
 
-            await userModel.updateOne({ _id: decodedToken.id }, { $set: { password: newHashedPassword } });
+            await userRepo.updateUser(decoded.id, { password: newHashedPassword });
             return { status: 200, message: `Password has been changed successfully!` }
         } catch (error) {
             return { status: 500, message: error.message }

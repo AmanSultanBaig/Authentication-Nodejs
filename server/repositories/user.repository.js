@@ -28,7 +28,7 @@ class UserRepository {
 
     async createUser(params) {
         try {
-            const data = await userModel.save(params);
+            const data = await userModel.create(params);
             if (!data) {
                 return null
             }
