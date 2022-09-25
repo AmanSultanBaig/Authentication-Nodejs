@@ -1,8 +1,11 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const UserModel = require("../models/user.model")
+
 const { hashPassword } = require("../helper/bcrypt")
 const { createJwtToken } = require("../helper/jwt")
+
+const userRepository = require("../repositories/user.repository")
+const userRepo = new userRepository();
 
 const { FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET, BACKEND_URL, LOGIN_SECRET_KEY } = process.env;
 
@@ -24,7 +27,7 @@ passport.use(new FacebookStrategy({
 
     const { email, name, id } = fbUserDetails
 
-    let isUserExist = await UserModel.findOne({ facebook_id: id, email: email })
+    let isUserExist = await userRepo.getSingleUser({ facebook_id: id, email: email })
 
     // if user from facebook is already exist in system
     if (isUserExist) {
@@ -50,6 +53,6 @@ passport.use(new FacebookStrategy({
         token: fb_loginToken,
         user: { email: email, name: name, id: id }
     }
-    await UserModel.create(body)     // creating fb user to system
+    await userRepo.createUser(body)     // creating fb user to system
     return done(null, response);
 }))
