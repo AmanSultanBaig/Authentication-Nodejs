@@ -1,4 +1,4 @@
-const { jwtTokenVerification } = require("../helper/jwt")
+const { jwtTokenVerification } = require("../utils/jwt")
 const path = require("path")
 require("dotenv").config({ path: path.resolve(__dirname, '../.env') })
 const { LOGIN_SECRET_KEY } = process.env

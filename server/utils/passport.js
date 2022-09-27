@@ -1,8 +1,8 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 
-const { hashPassword } = require("../helper/bcrypt")
-const { createJwtToken } = require("../helper/jwt")
+const { hashPassword } = require("../utils/bcrypt")
+const { createJwtToken } = require("../utils/jwt")
 
 const userRepository = require("../db/repositories/user.repository")
 const userRepo = new userRepository();

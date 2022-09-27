@@ -7,7 +7,7 @@ module.exports = (app) => {
     const passport = require('passport');
     const session = require("express-session")
     require('dotenv').config()
-    require("./helper/passport")
+    require("./utils/passport")
 
     const { secretKey, PORT } = process.env;
 

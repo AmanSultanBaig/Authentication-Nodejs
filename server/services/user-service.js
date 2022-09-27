@@ -1,9 +1,9 @@
-const sendEmail = require("../helper/mailer");
-const bcrypt = require("../helper/bcrypt");
+const sendEmail = require("../utils/mailer");
+const bcrypt = require("../utils/bcrypt");
 
 const userRepository = require("../db/repositories/user.repository")
 
-const { jwtTokenVerification, createJwtToken } = require("../helper/jwt")
+const { jwtTokenVerification, createJwtToken } = require("../utils/jwt")
 const { VERIFICATION_SECRET_KEY, FRONTENT_URL, LOGIN_SECRET_KEY, RESET_PASSWORD_SECRET_KEY } = process.env
 
 const userRepo = new userRepository();
