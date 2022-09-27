@@ -4,7 +4,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const { hashPassword } = require("../helper/bcrypt")
 const { createJwtToken } = require("../helper/jwt")
 
-const userRepository = require("../repositories/user.repository")
+const userRepository = require("../db/repositories/user.repository")
 const userRepo = new userRepository();
 
 const { FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET, BACKEND_URL, LOGIN_SECRET_KEY } = process.env;
