@@ -3,14 +3,54 @@ const router = express.Router();
 const passport = require('passport');
 const { authenticateUser, authorizedUser } = require("../middlewares/auth-handling")
 
-const UserController = require("../controllers/user.controller")
+const UserService = require("../services/user-service")
+// Service Instance
+const UserServiceInstance = new UserService();
 
-router.post("/user/login", UserController.login)
-router.post("/user/sign-up", UserController.signUp)
-router.post("/user/verify-account", UserController.verifyAccount)
+router.post("/user/login", async (req, res) => {
+    try {
+        const response = await UserServiceInstance.SignIn(req.body);
+        res.status(response.status).json({ status: true, message: response.message, data: response.data })
+    } catch (error) {
+        next(error)
+    }
+})
 
-router.post("/user/forgot-password", UserController.forgotPassword)
-router.put("/user/reset-password", UserController.resetPassword)
+router.post("/user/sign-up", async (req, res, next) => {
+    try {
+        const data = await UserServiceInstance.SignUp(req.body);
+        res.status(data.status).json({ status: true, message: data.message })
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.post("/user/verify-account", async (req, res, next) => {
+    try {
+        const data = await UserServiceInstance.AccountActivation(req.body);
+        res.status(data.status).json({ status: true, message: data.message })
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.post("/user/forgot-password", async (req, res) => {
+    try {
+        const data = await UserServiceInstance.ForgotPassword(req.body);
+        res.status(data.status).json({ status: true, message: data.message })
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.put("/user/reset-password", async (req, res) => {
+    try {
+        const data = await UserServiceInstance.ChangePassword(req.body);
+        res.status(data.status).json({ status: true, message: data.message })
+    } catch (error) {
+        next(error)
+    }
+})
 
 // If login failed with facebook
 router.get("/login", (req, res) => res.send("Login failed with Facebook"))
@@ -25,6 +65,11 @@ router.get('/callback', passport.authenticate('facebook', { failureRedirect: '/l
 });
 
 // protected routes | only logged in user can access 
-router.get("/user/access-user", authenticateUser, authorizedUser, UserController.getUserAccess)
+router.get("/user/access-user", authenticateUser, authorizedUser, (req, res) => {
+    res.status(200).json({
+        status: true,
+        message: "I Have accessed this route"
+    })
+})
 
 module.exports = router;
