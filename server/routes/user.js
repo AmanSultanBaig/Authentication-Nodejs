@@ -7,7 +7,7 @@ const UserService = require("../services/user-service")
 // Service Instance
 const UserServiceInstance = new UserService();
 
-router.post("/user/login", async (req, res) => {
+router.post("/user/login", async (req, res, next) => {
     try {
         const response = await UserServiceInstance.SignIn(req.body);
         res.status(response.status).json({ status: true, message: response.message, data: response.data })
@@ -34,7 +34,7 @@ router.post("/user/verify-account", async (req, res, next) => {
     }
 })
 
-router.post("/user/forgot-password", async (req, res) => {
+router.post("/user/forgot-password", async (req, res, next) => {
     try {
         const data = await UserServiceInstance.ForgotPassword(req.body);
         res.status(data.status).json({ status: true, message: data.message })
@@ -43,7 +43,7 @@ router.post("/user/forgot-password", async (req, res) => {
     }
 })
 
-router.put("/user/reset-password", async (req, res) => {
+router.put("/user/reset-password", async (req, res, next) => {
     try {
         const data = await UserServiceInstance.ChangePassword(req.body);
         res.status(data.status).json({ status: true, message: data.message })
